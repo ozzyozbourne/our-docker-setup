@@ -32,16 +32,14 @@ pnpm workspace: `apps/web` (SvelteKit 3, adapter-node) and `packages/db`.
 ## Deploys
 
 `.github/workflows/ci.yml` runs checks and builds the image on every push and pull request.
-On `main` it also deploys, once these repository settings exist:
+On `main` it pushes the image to `ghcr.io/ozzyozbourne/ouramp-app` (public, tagged with the
+commit SHA and `latest`) and deploys, once these repository settings exist:
 
 | Kind | Name | Value |
 |---|---|---|
-| variable | `GCP_PROJECT_ID`, `GCP_REGION` | the project and Artifact Registry region |
-| variable | `GCP_WIF_PROVIDER`, `GCP_SERVICE_ACCOUNT` | Workload Identity Federation provider and the service account that may push |
 | variable | `VM_HOST`, `VM_SSH_USER` | the VM's tailnet name and SSH user |
 | secret | `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET` | Tailscale OAuth client allowed to create `tag:ci` nodes |
 
-The deploy pushes the `app` image to Artifact Registry (repository `ouramp`),
-joins the tailnet as `tag:ci`, copies the compose files to `~/ouramp` on the VM over
+The deploy joins the tailnet as `tag:ci`, copies the compose files to `~/ouramp` on the VM over
 Tailscale SSH and runs `docker compose pull && docker compose up -d`. The VM keeps its
 own `.env`; it is never in this repo.
