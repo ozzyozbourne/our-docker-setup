@@ -62,10 +62,14 @@ services:
   alloy:
     image: grafana/alloy:v1.21.2
     restart: unless-stopped
-    # --stability.level is only for the debug exporter; drop it once the real exporters are in
-    command: ["run", "--server.http.listen-addr=0.0.0.0:12345", "--stability.level=experimental", "/etc/alloy/config.alloy"]
+    command: ["run", "--server.http.listen-addr=0.0.0.0:12345", "/etc/alloy/config.alloy"]
     environment:
       ALLOY_OTLP_TOKEN: ${ALLOY_OTLP_TOKEN:?set in .env}
+      GRAFANA_OTLP_ENDPOINT: ${GRAFANA_OTLP_ENDPOINT:?set in .env}
+      GRAFANA_INSTANCE_ID: ${GRAFANA_INSTANCE_ID:?set in .env}
+      GRAFANA_API_TOKEN: ${GRAFANA_API_TOKEN:?set in .env}
+      HONEYCOMB_ENDPOINT: ${HONEYCOMB_ENDPOINT:-https://api.honeycomb.io}
+      HONEYCOMB_API_KEY: ${HONEYCOMB_API_KEY:?set in .env}
     volumes:
       - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
     ports:

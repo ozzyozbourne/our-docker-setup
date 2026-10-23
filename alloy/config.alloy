@@ -17,14 +17,31 @@ otelcol.receiver.otlp "default" {
 
 otelcol.processor.batch "default" {
   output {
-    logs    = [otelcol.exporter.debug.default.input]
-    metrics = [otelcol.exporter.debug.default.input]
-    traces  = [otelcol.exporter.debug.default.input]
+    logs    = [otelcol.exporter.otlphttp.grafana.input]
+    metrics = [otelcol.exporter.otlphttp.grafana.input]
+    traces  = [otelcol.exporter.otlphttp.grafana.input, otelcol.exporter.otlphttp.honeycomb.input]
   }
 }
 
-// Prints a summary of what arrives. Swap for the Grafana Cloud and Honeycomb
-// exporters once their keys are in .env.
-otelcol.exporter.debug "default" {
-  verbosity = "basic"
+// Grafana Cloud: logs to Loki, metrics to Prometheus, traces to Tempo.
+otelcol.auth.basic "grafana" {
+  username = sys.env("GRAFANA_INSTANCE_ID")
+  password = sys.env("GRAFANA_API_TOKEN")
+}
+
+otelcol.exporter.otlphttp "grafana" {
+  client {
+    endpoint = sys.env("GRAFANA_OTLP_ENDPOINT")
+    auth     = otelcol.auth.basic.grafana.handler
+  }
+}
+
+// Honeycomb: traces only.
+otelcol.exporter.otlphttp "honeycomb" {
+  client {
+    endpoint = sys.env("HONEYCOMB_ENDPOINT")
+    headers  = {
+      "x-honeycomb-team" = sys.env("HONEYCOMB_API_KEY"),
+    }
+  }
 }
