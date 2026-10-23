@@ -1,0 +1,30 @@
+// OTLP in on 4318 (bearer token required; Funnel exposes it on 8443 for executors).
+otelcol.auth.bearer "executors" {
+  token = sys.env("ALLOY_OTLP_TOKEN")
+}
+
+otelcol.receiver.otlp "default" {
+  http {
+    endpoint = "0.0.0.0:4318"
+    auth     = otelcol.auth.bearer.executors.handler
+  }
+  output {
+    logs    = [otelcol.processor.batch.default.input]
+    metrics = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.processor.batch "default" {
+  output {
+    logs    = [otelcol.exporter.debug.default.input]
+    metrics = [otelcol.exporter.debug.default.input]
+    traces  = [otelcol.exporter.debug.default.input]
+  }
+}
+
+// Prints a summary of what arrives. Swap for the Grafana Cloud and Honeycomb
+// exporters once their keys are in .env.
+otelcol.exporter.debug "default" {
+  verbosity = "basic"
+}
