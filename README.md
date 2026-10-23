@@ -9,7 +9,6 @@ The backend for Our Amp on one machine: a docker compose file with
 | `app` | built from `Dockerfile` | SvelteKit server (Node 26); the Rivet actors join it in M1 |
 | `alloy` | `grafana/alloy:v1.21.2` | OTLP collector on 4318, bearer token required |
 | `pgadmin` | `dpage/pgadmin4:9.18.0` | Web UI for Postgres at `127.0.0.1:5050`; never public |
-| `backup` | built from `backup/` | Daily `pg_dump` of both databases to R2 (profile `backup`) |
 
 Every published port is bound to `127.0.0.1`. On the VM, Tailscale Funnel makes them public:
 443 → 3000 (app), 8443 → 4318 (Alloy), 10000 → 3001 (portal, once it exists).
@@ -42,7 +41,7 @@ On `main` it also deploys, once these repository settings exist:
 | variable | `VM_HOST`, `VM_SSH_USER` | the VM's tailnet name and SSH user |
 | secret | `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET` | Tailscale OAuth client allowed to create `tag:ci` nodes |
 
-The deploy pushes `app` and `backup` images to Artifact Registry (repository `ouramp`),
+The deploy pushes the `app` image to Artifact Registry (repository `ouramp`),
 joins the tailnet as `tag:ci`, copies the compose files to `~/ouramp` on the VM over
 Tailscale SSH and runs `docker compose pull && docker compose up -d`. The VM keeps its
 own `.env`; it is never in this repo.

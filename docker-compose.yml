@@ -88,21 +88,6 @@ services:
       postgres:
         condition: service_healthy
 
-  backup:
-    image: ${BACKUP_IMAGE:-ouramp-backup}:${IMAGE_TAG:-local}
-    build: ./backup
-    restart: unless-stopped
-    profiles: [backup] # off until the R2 keys are in .env: docker compose --profile backup up -d
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
-      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
-      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
-      R2_BUCKET: ${R2_BUCKET:-}
-    depends_on:
-      postgres:
-        condition: service_healthy
 
 volumes:
   postgres-data:
