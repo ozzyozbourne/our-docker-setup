@@ -8,10 +8,12 @@ The backend for Our Amp on one machine: a docker compose file with
 | `rivet-engine` | `rivetdev/engine:full-2.3.30` | Self-hosted Rivet engine, stored in Postgres |
 | `app` | built from `Dockerfile` | SvelteKit server (Node 26); the Rivet actors join it in M1 |
 | `alloy` | `grafana/alloy:v1.21.2` | OTLP collector on 4318, bearer token required |
+| `pgadmin` | `dpage/pgadmin4:9.18.0` | Web UI for Postgres at `127.0.0.1:5050`; never public |
 | `backup` | built from `backup/` | Daily `pg_dump` of both databases to R2 (profile `backup`) |
 
 Every published port is bound to `127.0.0.1`. On the VM, Tailscale Funnel makes them public:
 443 → 3000 (app), 8443 → 4318 (Alloy), 10000 → 3001 (portal, once it exists).
+pgAdmin stays private: on the VM, `tailscale serve --bg --https=5050 5050` opens it to your tailnet only.
 
 ## Run it locally
 

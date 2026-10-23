@@ -72,8 +72,9 @@ jobs:
         env:
           VM: ${{ vars.VM_SSH_USER }}@${{ vars.VM_HOST }}
         run: |
-          ssh -o StrictHostKeyChecking=accept-new "$VM" mkdir -p ouramp/postgres ouramp/alloy
+          ssh -o StrictHostKeyChecking=accept-new "$VM" mkdir -p ouramp/postgres ouramp/alloy ouramp/pgadmin
           scp docker-compose.yml "$VM":ouramp/
           scp postgres/init.sh "$VM":ouramp/postgres/
           scp alloy/config.alloy "$VM":ouramp/alloy/
+          scp pgadmin/servers.json "$VM":ouramp/pgadmin/
           ssh "$VM" "cd ouramp && export APP_IMAGE=$REGISTRY/app BACKUP_IMAGE=$REGISTRY/backup IMAGE_TAG=${{ github.sha }} && docker compose pull && docker compose up -d --no-build --remove-orphans"

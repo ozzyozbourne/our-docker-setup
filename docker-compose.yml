@@ -71,6 +71,23 @@ services:
     ports:
       - 127.0.0.1:4318:4318
 
+  pgadmin:
+    image: dpage/pgadmin4:9.18.0
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:?set in .env}
+      PGADMIN_CONFIG_UPGRADE_CHECK_ENABLED: "False"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    # Never public: on the VM, open it over Tailscale (tailnet only), not Funnel.
+    ports:
+      - 127.0.0.1:5050:80
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   backup:
     image: ${BACKUP_IMAGE:-ouramp-backup}:${IMAGE_TAG:-local}
     build: ./backup
@@ -89,3 +106,4 @@ services:
 
 volumes:
   postgres-data:
+  pgadmin-data:
